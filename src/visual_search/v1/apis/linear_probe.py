@@ -18,7 +18,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from src.haystack.components.milvus.document_store import MilvusDocumentStore
 
 from ...common.apis.collections import pipeline_handler
-from ...common.db_models import get_collections, list_collections
+from ...common.db_models import get_collections
 from ...common.models import EmbeddingQuery, LinearProbeRequest, LinearProbeResponse
 from ...common.pipelines import get_document_stores, run_linear_probe_pipeline
 from ...logger import logger
@@ -79,8 +79,7 @@ async def linear_probe(
     collection_ids = set(
         labelled_docs.collection_name for labelled_docs in linear_probe_request.labels
     )
-    lookup = list_collections()
-    collections = [c for c in get_collections(lookup)]
+    collections = [get_collections(collection_id) for collection_id in collection_ids]
     logger.debug(f"Found {len(collections)} collections")
 
     if len(collections) != len(collection_ids):

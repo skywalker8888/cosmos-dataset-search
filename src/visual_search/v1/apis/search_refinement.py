@@ -112,7 +112,7 @@ async def train(
     )
 
     if len(collections) != len(collection_ids):
-        missing = collection_ids - set(collection.id for collection in collections)
+        missing = set(collection_ids) - {collection.id for collection in collections}
         raise HTTPException(
             status_code=404,
             detail=(f"Requested collections {missing} not found!"),
