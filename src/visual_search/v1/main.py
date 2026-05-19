@@ -31,7 +31,7 @@ from src.visual_search.v1.apis.search_refinement import (
 from src.visual_search.v1.apis.milvus_admin import router as MilvusAdminApiRouter
 
 app = FastAPI(
-    title="Visual Indexing and Search µService",
+    title="Dear Saigon",
     description=(
         "Service for indexing and querying of collections of video data for RAG applications"
     ),
