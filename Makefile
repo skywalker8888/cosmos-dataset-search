@@ -130,34 +130,26 @@ test-unit-local: check-install
 	$(MAKE) test-haystack-local
 	$(MAKE) test-models-local
 
+# Discovered by glob rather than enumerated: hand-listing files silently drops
+# new tests. pytest.ini excludes the "scripts" dir, which holds integration
+# drivers that match the test filename pattern but are not pytest modules.
 test-visual-search-local: check-install
 	@echo "$(BLUE)Running visual search unit tests...$(NC)"
-	. .venv/bin/activate && pytest src/visual_search/tests/test_bulk_indexing.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_curator_parquet_converter.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_pipelines.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_retrieval.py -v
-	. .venv/bin/activate && pytest src/visual_search/v1/apis/utils/test_milvus_utils.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_k8s_secrets.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_nvcf_file_based_secrets_manager.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_cosmos_document_indexing.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_cosmos_pipeline_config.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_collections.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_document_deletion.py -v
+	. .venv/bin/activate && pytest src/visual_search/ -v
 
 test-haystack-local: check-install
 	@echo "$(BLUE)Running haystack unit tests...$(NC)"
-	. .venv/bin/activate && pytest src/haystack/tests/serializer_test.py -v
-	. .venv/bin/activate && pytest src/haystack/components/tests/joiners_test.py -v
-	. .venv/bin/activate && pytest src/haystack/components/milvus/tests/document_store_test.py -v
-	. .venv/bin/activate && pytest src/haystack/components/milvus/tests/filter_utils_test.py -v
-	. .venv/bin/activate && pytest src/haystack/components/milvus/tests/schema_utils_test.py -v
-	. .venv/bin/activate && pytest src/haystack/tests/test_cosmos_all_components.py -v
-	. .venv/bin/activate && pytest src/haystack/tests/test_cosmos_integration.py -v
-	. .venv/bin/activate && pytest src/haystack/tests/test_cosmos_video_embedder.py -v
+	. .venv/bin/activate && pytest src/haystack/ -v
 
 test-models-local: check-install
 	@echo "$(BLUE)Running model unit tests...$(NC)"
-	. .venv/bin/activate && pytest src/models/linear_classifier/tests/model_test.py -v
+	. .venv/bin/activate && pytest src/models/ -v
+
+# Not wired into test-unit-local: these exercise the Triton python backend and
+# may require model weights. Verify they pass locally before adding to `check`.
+test-triton-local: check-install ## Run Triton backend tests (not part of `make check`)
+	@echo "$(BLUE)Running triton unit tests...$(NC)"
+	. .venv/bin/activate && pytest src/triton/ -v
 
 test-all-unit-local: check-install
 	@echo "$(BLUE)Running all unit tests...$(NC)"
