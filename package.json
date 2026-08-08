@@ -3,17 +3,9 @@
   "version": "0.6.0",
   "description": "NVIDIA Cosmos Video Dataset Search Platform",
   "private": true,
-  "workspaces": [
-    "src/visual_search/ui/react"
-  ],
   "scripts": {
-    "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces",
-    "lint": "npm run lint --workspaces",
-    "format": "npm run format --workspaces",
-    "clean": "npm run clean --workspaces",
-    "dev": "npm run dev --workspaces",
-    "start": "npm run start --workspaces"
+    "dev": "make -C . test-integration-up",
+    "stop": "make -C . test-integration-down"
   },
   "engines": {
     "node": ">=18.0.0",
