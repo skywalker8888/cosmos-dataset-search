@@ -11,6 +11,10 @@ Before starting, ensure:
 - Virtual environment is activated: `source .venv/bin/activate`
 - For Python examples: `requests` library is available (installed with CDS)
 
+> **Before exposing this API on a network**, read
+> [API Security and Deployment Model](api-security.md). The service performs
+> no authentication of its own; the examples below assume a local deployment.
+
 ## Tutorial Overview
 
 This tutorial walks through a complete workflow:
