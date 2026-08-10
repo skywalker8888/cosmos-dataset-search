@@ -155,25 +155,16 @@ ignore_missing_imports = true
 module = "google.protobuf.*"
 ignore_missing_imports = true
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "--verbose",
-    "--cov=src",
-    "--cov-report=term-missing",
-    "--cov-report=xml",
-    "--cov-report=html",
-]
-markers = [
-    "gpu: marks tests as requiring GPU (deselect with '-m \"not gpu\"')",
-    "integration: marks tests as integration tests",
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-]
+# NOTE: pytest configuration lives in pytest.ini, which takes precedence over
+# [tool.pytest.ini_options]. A duplicate block here previously set
+# testpaths = ["tests"] — a directory that does not exist — and was silently
+# dead config. Keep exactly one pytest configuration; if you consolidate into
+# this file, delete pytest.ini in the same change.
+#
+# Coverage flags that lived in the removed block and are NOT currently applied:
+#   --cov=src --cov-report=term-missing --cov-report=xml --cov-report=html
+# Add them to pytest.ini's addopts if you want coverage on by default; the
+# [tool.coverage.*] settings below already configure the reports.
 
 [tool.coverage.run]
 source = ["src"]
