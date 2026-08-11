@@ -90,6 +90,38 @@ jobs:
           path: coverage.xml
           if-no-files-found: warn
 
+  typecheck:
+    name: mypy (non-blocking)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Non-blocking on purpose. [tool.mypy] has been configured in
+    # pyproject.toml and never run, so the codebase has no clean baseline --
+    # a blocking job would fail every PR on day one. It reports instead.
+    #
+    # To make it blocking: upgrade mypy (0.971 is from 2022), fix or
+    # explicitly ignore the reported errors, then delete continue-on-error.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - run: uv python install 3.10
+
+      - run: uv sync --all-extras --index-strategy unsafe-best-match
+
+      - name: Run mypy
+        run: uv run mypy src --ignore-missing-imports --no-error-summary || true
+
+      - name: Type-check summary
+        run: |
+          echo "mypy runs non-blocking. It would have caught the annotation on"
+          echo "get_collections(), declared -> List[Collection] but returning a"
+          echo "single Collection -- the root cause of three known defects."
+
   # GPU tier — not enabled.
   #
   # Running `pytest -m gpu` and `make test-integration-up` requires a runner

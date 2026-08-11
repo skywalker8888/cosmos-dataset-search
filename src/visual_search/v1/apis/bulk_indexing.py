@@ -69,7 +69,6 @@ def _safe_is_milvus(ds: Any) -> bool:
     `isinstance(ds, MilvusDocumentStore)` but tolerant of the
     test-suite patch that turns `MilvusDocumentStore` into a MagicMock.
     """
-    logger.warning("_safe_is_milvus")
     try:
         from src.haystack.components.milvus.document_store import MilvusDocumentStore
 

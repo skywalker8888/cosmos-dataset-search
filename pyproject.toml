@@ -91,6 +91,8 @@ client = [
 ]
 
 dev = [
+    # NOTE: mypy 0.971 dates from 2022. The CI type-check job runs
+    # non-blocking until this is upgraded and a clean baseline established.
     "mypy==0.971",
     "tomli==2.0.1",
     "mypy-extensions==0.4.3",
@@ -99,7 +101,6 @@ dev = [
     "flake8",
     "pre-commit",
     "pytest-xdist",
-    "pytest-cov"
 ]
 
 # Testing dependencies
