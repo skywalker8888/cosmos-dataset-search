@@ -17,6 +17,11 @@ import os
 from pathlib import Path
 
 import numpy as np
+import pytest
+
+# Requires CUDA: the model config below sets device to "cuda". Deselect with
+# -m "not gpu".
+pytestmark = pytest.mark.gpu
 
 import src.triton.triton_python_backend_utils as pb_utils
 from src.triton.model_repository.aesthetic.model import TritonPythonModel

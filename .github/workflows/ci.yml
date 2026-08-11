@@ -1,0 +1,130 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: LicenseRef-NvidiaProprietary
+#
+# NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+# property and proprietary rights in and to this material, related
+# documentation and any modifications thereto. Any use, reproduction,
+# disclosure or distribution of this material and related documentation
+# without an express license agreement from NVIDIA CORPORATION or
+# its affiliates is strictly prohibited.
+
+# CPU-only continuous integration.
+#
+# This runs the unit suite on standard GitHub runners. It deliberately does
+# NOT run the GPU or integration tiers:
+#   - tests marked `gpu` need CUDA (see the gpu-tests job at the bottom)
+#   - `make test-integration-up` needs an NVIDIA GPU, the Container Toolkit
+#     and an NGC key with NIM entitlement
+#
+# The unit suite is CPU-safe because src/visual_search/tests/conftest.py
+# provides a fake Milvus client and the service-touching tests patch their
+# dependencies. torch installs and imports fine on a CPU runner; only the two
+# `gpu`-marked modules require an actual device.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Required by the Makefile's install targets; several deps resolve only with
+  # a relaxed index strategy.
+  UV_INDEX_STRATEGY: unsafe-best-match
+  UV_GIT_LFS: "1"
+
+jobs:
+  lint:
+    name: pre-commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - uses: pre-commit/action@v3.0.1
+
+  test:
+    name: unit tests (CPU)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Set up Python
+        run: uv python install 3.10
+
+      - name: Install dependencies
+        # Note: this pulls torch==2.6.0+cu118 (~2.5GB). The uv cache above
+        # makes subsequent runs substantially faster.
+        run: uv sync --all-extras --index-strategy unsafe-best-match
+
+      - name: Run unit tests
+        # -m "not gpu" deselects the two CUDA-dependent modules:
+        #   src/models/aesthetic/tests/dataset_test.py
+        #   src/triton/model_repository/aesthetic/tests/aesthetic_test.py
+        run: uv run pytest -m "not gpu" --cov=src --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          if-no-files-found: warn
+
+  # GPU tier — not enabled.
+  #
+  # Running `pytest -m gpu` and `make test-integration-up` requires a runner
+  # with an NVIDIA GPU (16GB+ VRAM), the NVIDIA Container Toolkit, driver 525+,
+  # and an NGC key with NIM entitlement. GitHub-hosted runners provide none of
+  # these.
+  #
+  # To enable: register a self-hosted GPU runner, add NVIDIA_API_KEY to the
+  # repository secrets, and uncomment the job below.
+  #
+  # gpu-tests:
+  #   name: unit tests (GPU)
+  #   runs-on: [self-hosted, gpu]
+  #   timeout-minutes: 60
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         lfs: true
+  #     - uses: astral-sh/setup-uv@v5
+  #       with:
+  #         enable-cache: true
+  #     - run: uv sync --all-extras --index-strategy unsafe-best-match
+  #     - run: uv run pytest -m gpu
+  #
+  # integration:
+  #   name: integration (GPU + NGC)
+  #   runs-on: [self-hosted, gpu]
+  #   timeout-minutes: 90
+  #   env:
+  #     NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+  #     DATA_DIR: ${{ runner.temp }}/data
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - run: cp deploy/standalone/.env.example deploy/standalone/.env
+  #     - run: make test-integration-up
+  #     - run: make test-integration-run
+  #     - if: always()
+  #       run: make test-integration-down
