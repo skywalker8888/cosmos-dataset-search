@@ -82,10 +82,13 @@ jobs:
         run: uv sync --all-extras --index-strategy unsafe-best-match
 
       - name: Run unit tests
-        # -m "not gpu" deselects the two CUDA-dependent modules:
-        #   src/models/aesthetic/tests/dataset_test.py
-        #   src/triton/model_repository/aesthetic/tests/aesthetic_test.py
-        run: uv run pytest -m "not gpu" --cov=src --cov-report=xml --cov-report=term-missing
+        # Deselects:
+        #   gpu         - needs CUDA (models/aesthetic/tests/dataset_test.py)
+        #   integration - needs assets not in the repo, e.g. the aesthetic
+        #                 .pth weights under models/aesthetic/variants/
+        # src/triton/model_repository is excluded in pytest.ini; its production
+        # module imports a clip package that is missing from this repository.
+        run: uv run pytest -m "not gpu and not integration" --cov=src --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage
         if: always()
