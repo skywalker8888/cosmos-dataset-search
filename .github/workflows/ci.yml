@@ -23,14 +23,19 @@
 
 name: CI
 
+# Runs on every branch, not just main. Restricting push to [main] made the
+# workflow unreachable from the branch that introduced it: no PR existed, so
+# pull_request never fired, and workflow_dispatch requires the file to be on
+# the default branch already.
 on:
-  pull_request:
   push:
-    branches: [main]
+  pull_request:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # head_ref for pull_request events, ref for pushes -- so the push and PR
+  # events for the same branch share a group and dedupe instead of running twice.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 env:
