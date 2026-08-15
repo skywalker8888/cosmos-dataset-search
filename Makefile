@@ -143,7 +143,7 @@ test-haystack-local: check-install
 
 test-models-local: check-install
 	@echo "$(BLUE)Running model unit tests...$(NC)"
-	. .venv/bin/activate && pytest src/models/ -v
+	. .venv/bin/activate && pytest src/models/ -v -m "not gpu and not integration"
 
 # Not wired into test-unit-local: these exercise the Triton python backend and
 # may require model weights. Verify they pass locally before adding to `check`.

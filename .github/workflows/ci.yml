@@ -33,9 +33,10 @@ on:
   workflow_dispatch:
 
 concurrency:
-  # head_ref for pull_request events, ref for pushes -- so the push and PR
-  # events for the same branch share a group and dedupe instead of running twice.
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  # head_ref for pull_request events, ref_name for pushes -- both resolve to
+  # the bare branch name so the push and PR events for the same branch share
+  # a group and dedupe instead of running twice.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 env:

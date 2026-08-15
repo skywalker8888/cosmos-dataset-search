@@ -20,11 +20,6 @@ from torch import nn
 
 from src.models.aesthetic import AestheticPredictor, load_model
 
-# Requires pretrained weights under models/aesthetic/variants/*.pth, which are
-# not committed to this repository. Without them test_load_model fails with
-# FileNotFoundError. Deselect with -m "not integration".
-pytestmark = pytest.mark.integration
-
 INPUT_SIZE = 16
 
 
@@ -63,6 +58,10 @@ def test_aesthetic_predictor_train(model: AestheticPredictor) -> None:
     trainer.fit(model, train_dataloader, val_dataloader)
 
 
+# Requires pretrained weights under models/aesthetic/variants/*.pth, which are
+# not committed to this repository. Without them this test fails with
+# FileNotFoundError. Deselect with -m "not integration".
+@pytest.mark.integration
 @pytest.mark.parametrize(
     "params",
     [
