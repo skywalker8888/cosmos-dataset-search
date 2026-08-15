@@ -312,19 +312,19 @@ except Exception as e:
 documents = []
 for filename in video_files:
     key = f"{prefix}/{filename}"
-    
+
     presigned_url = s3_client.generate_presigned_url(
         'get_object',
         Params={'Bucket': bucket, 'Key': key},
         ExpiresIn=3600
     )
-    
+
     documents.append({
         'url': presigned_url,
         'mime_type': 'video/mp4',
         'metadata': {'filename': filename}
     })
-    
+
     print(f"Prepared {filename} for ingestion")
 
 print(f"\nRequest preview (first document):")
@@ -411,10 +411,10 @@ if response.status_code != 200:
     print(f"Error: {response.text}")
 else:
     results = response.json()
-    
+
     retrievals = results.get('retrievals', [])
     print(f"Found {len(retrievals)} results:\n")
-    
+
     for i, result in enumerate(retrievals, 1):
         print(f"Result {i}:")
         print(f"  Score: {result['score']:.4f}")

@@ -140,6 +140,9 @@ allow-direct-references = true
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
 
+[tool.isort]
+profile = "black"
+
 [tool.mypy]
 # From third_party/mypy/.mypy.ini
 ignore_missing_imports = true

@@ -19,12 +19,12 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+import src.triton.triton_python_backend_utils as pb_utils
+from src.triton.model_repository.aesthetic.model import TritonPythonModel
+
 # Requires CUDA: the model config below sets device to "cuda". Deselect with
 # -m "not gpu".
 pytestmark = pytest.mark.gpu
-
-import src.triton.triton_python_backend_utils as pb_utils
-from src.triton.model_repository.aesthetic.model import TritonPythonModel
 
 
 def test_aesthetic_default(tmp_path: Path) -> None:
@@ -37,9 +37,7 @@ def test_aesthetic_default(tmp_path: Path) -> None:
             "clip_weights": {"string_value": "openai"},
             "device": {"string_value": "cuda"},
             "cache_dir": {"string_value": tmp_path.as_posix()},
-            "aesthetic_weights": {
-                "string_value": "models/aesthetic/1/linear_mlp.pth"
-            },
+            "aesthetic_weights": {"string_value": "models/aesthetic/1/linear_mlp.pth"},
         }
     }
     model_config_str = json.dumps(model_config)
@@ -49,7 +47,9 @@ def test_aesthetic_default(tmp_path: Path) -> None:
     assert model.clip_variant == "ViT-L-14"
     assert model.pretrained_weights == "openai"
 
-    with open("src/triton/model_repository/aesthetic/tests/data/test_image.png", "rb") as fp:
+    with open(
+        "src/triton/model_repository/aesthetic/tests/data/test_image.png", "rb"
+    ) as fp:
         image_bytes = fp.read()
 
     requests = [

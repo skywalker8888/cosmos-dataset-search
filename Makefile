@@ -26,7 +26,7 @@ RED := \033[0;31m
 GREEN := \033[0;32m
 YELLOW := \033[0;33m
 BLUE := \033[0;34m
-NC := \033[0m 
+NC := \033[0m
 
 help:
 	@echo "$(BLUE)Cosmos Video Dataset Search - Build System$(NC)"
@@ -37,7 +37,7 @@ help:
 # Environment Setup
 # ==============================================================================
 
-install: 
+install:
 	@echo "$(GREEN)Installing dependencies...$(NC)"
 	$(MAKE) install-python
 	@echo "$(BLUE)Installing CDS client CLI...$(NC)"
@@ -53,7 +53,7 @@ install-benchmark: install-python ## Install benchmarking/accuracy dependencies
 	@echo "$(BLUE)Installing benchmark extras (datasets, pandas …)…$(NC)"
 	UV_GIT_LFS=1 $(UV) sync --extra benchmark --index-strategy unsafe-best-match
 
-install-python: 
+install-python:
 	@echo "$(BLUE)Installing Python dependencies...$(NC)"
 	$(UV) venv .venv --python $(PYTHON)
 	@echo "$(BLUE)Installing all dependencies from pyproject.toml...$(NC)"
@@ -98,7 +98,7 @@ install-cds-cli: ## Install CDS client CLI as 'cds' command - Run make install-p
 	@echo "$(YELLOW)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(NC)"
 
 # ==============================================================================
-# Docker 
+# Docker
 # ==============================================================================
 
 build-docker:
@@ -121,7 +121,7 @@ build-host-setup:
 
 
 # ==============================================================================
-# Local Unit Testing 
+# Local Unit Testing
 # ==============================================================================
 
 test-unit-local: check-install
@@ -318,7 +318,7 @@ clean-volumes: ## Clean Docker volumes to fix metadata corruption issues
 	./scripts/integration-tools/clean-volumes.sh
 
 # ==============================================================================
-# Push Targets 
+# Push Targets
 # ==============================================================================
 # Usage: make push-visual-search IMAGE_TAG=debug-20250729
 push-visual-search: build-visual-search ## Push visual-search image to registry
@@ -365,7 +365,7 @@ package-helm-chart: ## Package Helm chart only (no client source)
 # Cleanup
 # ==============================================================================
 
-clean: 
+clean:
 	@echo "$(BLUE)Cleaning build artifacts...$(NC)"
 	rm -rf .venv/
 	rm -rf build/
@@ -377,12 +377,12 @@ clean:
 	rm -rf bin/
 	rm -rf node_modules/
 
-clean-docker: 
+clean-docker:
 	@echo "$(BLUE)Cleaning Docker resources...$(NC)"
 	docker system prune -f
 	docker image prune -f
 
-clean-models: 
+clean-models:
 	@echo "$(BLUE)Cleaning model weights...$(NC)"
 	rm -rf models/*/
 
@@ -390,11 +390,11 @@ clean-models:
 # Utilities
 # ==============================================================================
 
-shell: 
+shell:
 	@echo "$(BLUE)Opening development shell...$(NC)"
 	. .venv/bin/activate && $(SHELL)
 
-check: 
+check:
 	@echo "$(BLUE)Running all checks...$(NC)"
 	$(MAKE) lint
 	$(MAKE) test-unit-local

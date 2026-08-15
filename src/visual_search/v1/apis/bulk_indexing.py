@@ -15,8 +15,8 @@
 
 from __future__ import annotations
 
-from typing import Any
 import re
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pymilvus import BulkInsertState, MilvusException
@@ -147,10 +147,10 @@ async def insert_data(request: InsertDataRequest):
         s3_match = re.split(r"^(s3://[^/]+/)", file, 1)
         if len(s3_match) < 3 or not s3_match[2]:
             raise HTTPException(
-                400, 
-                f"Invalid S3 path format: '{file}'. Must be in format 's3://bucket/path/to/file.parquet'"
+                400,
+                f"Invalid S3 path format: '{file}'. Must be in format 's3://bucket/path/to/file.parquet'",
             )
-        
+
         job_id = store.bulk_insert_files(
             collection_name=safe_coll,
             file_paths=[s3_match[2]],

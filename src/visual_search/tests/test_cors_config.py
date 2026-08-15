@@ -49,6 +49,6 @@ def test_cors_allowed_domains_entries_are_explicit_origins():
 @pytest.mark.parametrize("forbidden", ["*", "null", ""])
 def test_cors_rejects_known_unsafe_origin_values(forbidden):
     """Guard against origin values that are unsafe with credentials enabled."""
-    assert forbidden not in settings.cors_allowed_domains, (
-        f"Unsafe origin value {forbidden!r} present in cors_allowed_domains."
-    )
+    assert (
+        forbidden not in settings.cors_allowed_domains
+    ), f"Unsafe origin value {forbidden!r} present in cors_allowed_domains."

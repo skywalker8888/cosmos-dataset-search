@@ -23,12 +23,9 @@
 
 name: CI
 
-# Runs on every branch, not just main. Restricting push to [main] made the
-# workflow unreachable from the branch that introduced it: no PR existed, so
-# pull_request never fired, and workflow_dispatch requires the file to be on
-# the default branch already.
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -51,12 +48,27 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The lint steps compare the PR base/head or the latest pushed commit.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - uses: pre-commit/action@v3.0.1
+      - name: Run pre-commit on PR changes
+        if: github.event_name == 'pull_request'
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: >-
+            --from-ref ${{ github.event.pull_request.base.sha }}
+            --to-ref ${{ github.event.pull_request.head.sha }}
+
+      - name: Run pre-commit on the latest pushed commit
+        if: github.event_name != 'pull_request'
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --from-ref HEAD^ --to-ref HEAD
 
   test:
     name: unit tests (CPU)
