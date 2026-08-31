@@ -8,8 +8,6 @@
 # without an express license agreement from NVIDIA CORPORATION or
 # its affiliates is strictly prohibited.
 
-import os
-
 from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -23,15 +21,15 @@ from src.visual_search.v1.apis.document_indexing import (
     router as DocumentIndexingApiRouter,
 )
 from src.visual_search.v1.apis.linear_probe import router as LinearProbeApiRouter
+from src.visual_search.v1.apis.milvus_admin import router as MilvusAdminApiRouter
 from src.visual_search.v1.apis.pipelines import router as PipelinesApiRouter
 from src.visual_search.v1.apis.search import router as SearchApiRouter
 from src.visual_search.v1.apis.search_refinement import (
     router as SearchRefinementApiRouter,
 )
-from src.visual_search.v1.apis.milvus_admin import router as MilvusAdminApiRouter
 
 app = FastAPI(
-    title="Visual Indexing and Search µService",
+    title="Dear Saigon",
     description=(
         "Service for indexing and querying of collections of video data for RAG applications"
     ),
@@ -84,9 +82,6 @@ app.include_router(SearchRefinementApiRouter)
 app.include_router(PipelinesApiRouter)
 app.include_router(MilvusAdminApiRouter)
 app.include_router(BulkIndexingApiRouter)
-
-if os.getenv("EXPOSE_BACKFILL_ENDPOINT"):
-    app.include_router(BackfillApiRouter)
 
 # /metrics endpoint scraped by Prometheus
 Instrumentator().instrument(app).expose(app, tags=["Metrics"])

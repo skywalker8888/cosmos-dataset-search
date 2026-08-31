@@ -26,7 +26,7 @@ RED := \033[0;31m
 GREEN := \033[0;32m
 YELLOW := \033[0;33m
 BLUE := \033[0;34m
-NC := \033[0m 
+NC := \033[0m
 
 help:
 	@echo "$(BLUE)Cosmos Video Dataset Search - Build System$(NC)"
@@ -37,7 +37,7 @@ help:
 # Environment Setup
 # ==============================================================================
 
-install: 
+install:
 	@echo "$(GREEN)Installing dependencies...$(NC)"
 	$(MAKE) install-python
 	@echo "$(BLUE)Installing CDS client CLI...$(NC)"
@@ -53,7 +53,7 @@ install-benchmark: install-python ## Install benchmarking/accuracy dependencies
 	@echo "$(BLUE)Installing benchmark extras (datasets, pandas …)…$(NC)"
 	UV_GIT_LFS=1 $(UV) sync --extra benchmark --index-strategy unsafe-best-match
 
-install-python: 
+install-python:
 	@echo "$(BLUE)Installing Python dependencies...$(NC)"
 	$(UV) venv .venv --python $(PYTHON)
 	@echo "$(BLUE)Installing all dependencies from pyproject.toml...$(NC)"
@@ -98,7 +98,7 @@ install-cds-cli: ## Install CDS client CLI as 'cds' command - Run make install-p
 	@echo "$(YELLOW)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(NC)"
 
 # ==============================================================================
-# Docker 
+# Docker
 # ==============================================================================
 
 build-docker:
@@ -121,7 +121,7 @@ build-host-setup:
 
 
 # ==============================================================================
-# Local Unit Testing 
+# Local Unit Testing
 # ==============================================================================
 
 test-unit-local: check-install
@@ -130,34 +130,26 @@ test-unit-local: check-install
 	$(MAKE) test-haystack-local
 	$(MAKE) test-models-local
 
+# Discovered by glob rather than enumerated: hand-listing files silently drops
+# new tests. pytest.ini excludes the "scripts" dir, which holds integration
+# drivers that match the test filename pattern but are not pytest modules.
 test-visual-search-local: check-install
 	@echo "$(BLUE)Running visual search unit tests...$(NC)"
-	. .venv/bin/activate && pytest src/visual_search/tests/test_bulk_indexing.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_curator_parquet_converter.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_pipelines.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_retrieval.py -v
-	. .venv/bin/activate && pytest src/visual_search/v1/apis/utils/test_milvus_utils.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_k8s_secrets.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_nvcf_file_based_secrets_manager.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_cosmos_document_indexing.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_cosmos_pipeline_config.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_collections.py -v
-	. .venv/bin/activate && pytest src/visual_search/tests/test_document_deletion.py -v
+	. .venv/bin/activate && pytest src/visual_search/ -v
 
 test-haystack-local: check-install
 	@echo "$(BLUE)Running haystack unit tests...$(NC)"
-	. .venv/bin/activate && pytest src/haystack/tests/serializer_test.py -v
-	. .venv/bin/activate && pytest src/haystack/components/tests/joiners_test.py -v
-	. .venv/bin/activate && pytest src/haystack/components/milvus/tests/document_store_test.py -v
-	. .venv/bin/activate && pytest src/haystack/components/milvus/tests/filter_utils_test.py -v
-	. .venv/bin/activate && pytest src/haystack/components/milvus/tests/schema_utils_test.py -v
-	. .venv/bin/activate && pytest src/haystack/tests/test_cosmos_all_components.py -v
-	. .venv/bin/activate && pytest src/haystack/tests/test_cosmos_integration.py -v
-	. .venv/bin/activate && pytest src/haystack/tests/test_cosmos_video_embedder.py -v
+	. .venv/bin/activate && pytest src/haystack/ -v
 
 test-models-local: check-install
 	@echo "$(BLUE)Running model unit tests...$(NC)"
-	. .venv/bin/activate && pytest src/models/linear_classifier/tests/model_test.py -v
+	. .venv/bin/activate && pytest src/models/ -v
+
+# Not wired into test-unit-local: these exercise the Triton python backend and
+# may require model weights. Verify they pass locally before adding to `check`.
+test-triton-local: check-install ## Run Triton backend tests (not part of `make check`)
+	@echo "$(BLUE)Running triton unit tests...$(NC)"
+	. .venv/bin/activate && pytest src/triton/ -v
 
 test-all-unit-local: check-install
 	@echo "$(BLUE)Running all unit tests...$(NC)"
@@ -326,7 +318,7 @@ clean-volumes: ## Clean Docker volumes to fix metadata corruption issues
 	./scripts/integration-tools/clean-volumes.sh
 
 # ==============================================================================
-# Push Targets 
+# Push Targets
 # ==============================================================================
 # Usage: make push-visual-search IMAGE_TAG=debug-20250729
 push-visual-search: build-visual-search ## Push visual-search image to registry
@@ -373,7 +365,7 @@ package-helm-chart: ## Package Helm chart only (no client source)
 # Cleanup
 # ==============================================================================
 
-clean: 
+clean:
 	@echo "$(BLUE)Cleaning build artifacts...$(NC)"
 	rm -rf .venv/
 	rm -rf build/
@@ -385,12 +377,12 @@ clean:
 	rm -rf bin/
 	rm -rf node_modules/
 
-clean-docker: 
+clean-docker:
 	@echo "$(BLUE)Cleaning Docker resources...$(NC)"
 	docker system prune -f
 	docker image prune -f
 
-clean-models: 
+clean-models:
 	@echo "$(BLUE)Cleaning model weights...$(NC)"
 	rm -rf models/*/
 
@@ -398,11 +390,11 @@ clean-models:
 # Utilities
 # ==============================================================================
 
-shell: 
+shell:
 	@echo "$(BLUE)Opening development shell...$(NC)"
 	. .venv/bin/activate && $(SHELL)
 
-check: 
+check:
 	@echo "$(BLUE)Running all checks...$(NC)"
 	$(MAKE) lint
 	$(MAKE) test-unit-local

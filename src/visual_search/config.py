@@ -24,8 +24,13 @@ class Settings(BaseModel):
         "https://ui.staging.vius.cv.nvidia.com",
         "https://ui.prod.vius.cv.nvidia.com",
         "https://ui.vius.cv.nvidia.com",
-        "*",  # Waabi # TODO - this is a security hole. For cvds_blueprint, we need to modify our ingress to inject localhost:8080 as the client header.
     ]
+    # NOTE: Do not add "*" here. CORSMiddleware is configured with
+    # allow_credentials=True; with a wildcard present Starlette treats every
+    # origin as allowed during preflight and reflects the requesting origin on
+    # cookie-bearing requests, so it does not fail closed. For cvds_blueprint,
+    # the ingress must inject the correct client origin header instead.
+    # Enforced by test_cors_config.py.
     openapi_tags: ClassVar[List[Dict[str, str]]] = [
         {"name": "Collections", "description": "Operations related to collections."},
         {

@@ -45,6 +45,8 @@ NVIDIA Cosmos Dataset Search (CDS)
    :caption: Reference Documentation
 
    api_reference.md
+   api-advanced-endpoints.md
+   api-security.md
    performance.md
 
 .. toctree::

@@ -11,6 +11,10 @@ Before starting, ensure:
 - Virtual environment is activated: `source .venv/bin/activate`
 - For Python examples: `requests` library is available (installed with CDS)
 
+> **Before exposing this API on a network**, read
+> [API Security and Deployment Model](api-security.md). The service performs
+> no authentication of its own; the examples below assume a local deployment.
+
 ## Tutorial Overview
 
 This tutorial walks through a complete workflow:
@@ -308,19 +312,19 @@ except Exception as e:
 documents = []
 for filename in video_files:
     key = f"{prefix}/{filename}"
-    
+
     presigned_url = s3_client.generate_presigned_url(
         'get_object',
         Params={'Bucket': bucket, 'Key': key},
         ExpiresIn=3600
     )
-    
+
     documents.append({
         'url': presigned_url,
         'mime_type': 'video/mp4',
         'metadata': {'filename': filename}
     })
-    
+
     print(f"Prepared {filename} for ingestion")
 
 print(f"\nRequest preview (first document):")
@@ -407,10 +411,10 @@ if response.status_code != 200:
     print(f"Error: {response.text}")
 else:
     results = response.json()
-    
+
     retrievals = results.get('retrievals', [])
     print(f"Found {len(retrievals)} results:\n")
-    
+
     for i, result in enumerate(retrievals, 1):
         print(f"Result {i}:")
         print(f"  Score: {result['score']:.4f}")
