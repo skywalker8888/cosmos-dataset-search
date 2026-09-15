@@ -33,7 +33,7 @@ from .logger import logger
 from .v1.main import app as app_v1
 
 app = FastAPI(
-    title="Visual Indexing and Search µService",
+    title="Dear Saigon",
     description="Service for indexing and querying of "
     "collections of image and video data for RAG applications",
     version="Latest version: 1.0.0-rc",

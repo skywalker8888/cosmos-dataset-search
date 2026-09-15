@@ -3,17 +3,9 @@
   "version": "0.6.0",
   "description": "NVIDIA Cosmos Video Dataset Search Platform",
   "private": true,
-  "workspaces": [
-    "src/visual_search/ui/react"
-  ],
   "scripts": {
-    "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces",
-    "lint": "npm run lint --workspaces",
-    "format": "npm run format --workspaces",
-    "clean": "npm run clean --workspaces",
-    "dev": "npm run dev --workspaces",
-    "start": "npm run start --workspaces"
+    "dev": "if [ \"$(uname)\" = Darwin ]; then printf 'cosmos-dataset-search cannot run on macOS.\\n\\n  make install  fails: decord 0.6.0 publishes no darwin wheel\\n                (manylinux2010_x86_64 and win_amd64 only)\\n  compose       needs an NVIDIA GPU, the Container Toolkit and an NGC key\\n\\nRun it on Linux with a GPU:\\n  cd deploy/standalone && cp .env.example .env   # set NVIDIA_API_KEY, DATA_DIR\\n  make test-integration-up\\n\\nPrerequisites: docs/docs/docker-compose-prerequisites.md\\n' >&2; exit 1; fi; make -C . test-integration-up",
+    "stop": "make -C . test-integration-down"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -42,4 +34,4 @@
     "prettier": "^3.0.0",
     "typescript": "^5.0.0"
   }
-} 
+}

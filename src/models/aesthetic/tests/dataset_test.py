@@ -13,11 +13,17 @@
 from pathlib import Path
 
 import numpy as np
+import pytest
 import pytorch_lightning as pl
 import torch
 import webdataset as wds
 
 from src.models.aesthetic import AestheticPredictor, make_loader
+
+# Requires CUDA: the Lightning Trainer below is constructed with
+# accelerator="gpu" and devices=torch.cuda.device_count(), which is 0 on a
+# CPU-only host. Deselect with -m "not gpu".
+pytestmark = pytest.mark.gpu
 
 EMBEDDING_SIZE: int = 128
 BATCH_SIZE: int = 10
