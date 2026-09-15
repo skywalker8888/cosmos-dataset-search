@@ -70,7 +70,7 @@ async def validation_exception_handler(
         errors.append(err)
     return JSONResponse(
         status_code=422,
-        content=jsonable_encoder({"detail": err}),
+        content=jsonable_encoder({"detail": errors}),
     )
 
 
